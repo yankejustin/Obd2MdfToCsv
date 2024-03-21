@@ -1,0 +1,4 @@
+Running the Workflow
+
+    Build your Docker image: docker build -t mdf-converter .
+    Run your Docker container: docker run -v /path/to/your/files:/app mdf-converter
