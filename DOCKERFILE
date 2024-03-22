@@ -1,10 +1,14 @@
+# Official Python runtime as parent image
 FROM python:3.9-slim
 
-WORKDIR /app
+# Set container working directory
+WORKDIR /usr/src/app
 
-COPY requirements.txt .
+# Copy the current directory contents into the container at /usr/src/app
+COPY . /usr/src/app
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-CMD ["python", "app.py"]
+# Define entrypoint and default command
+ENTRYPOINT ["python", "app.py"]
+CMD ["data/input.mdf"]

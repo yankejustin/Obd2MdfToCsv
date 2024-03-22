@@ -1,20 +1,27 @@
+import os
 import pandas as pd
 from asammdf import MDF
+import argparse
 
 def convert_mdf_to_csv(mdf_file_path):
     print("Loading MDF file...")
-    mdf = MDF(mdf_file_path)
+    try:
+        mdf = MDF(mdf_file_path)
+    except Exception as e:
+        print(f"Failed to load MDF file: {e}")
+        return None  # Return None to indicate failure
 
     # Identify the last group number
     last_group_number = len(mdf.groups) - 1
+    output_file_path = os.path.splitext(mdf_file_path)[0] + '_FullOutput.csv'
+    print(f"Intending to do a full output at {output_file_path}")
     print(f"Identified the last group, this is the one that we want to use: Group {last_group_number}")
 
     # Export only the last group to CSV
-    output_csv_path = mdf_file_path + ".csv"
-    mdf.export(fmt='csv', filename=output_csv_path, single_time_base=True, channels=None, time_from_zero=False, empty_channels='skip', keep_same_value=False, raster=None, comment=None, compression=0, ignore_value2text_conversions=False, time_as_date=False, oned_as='column', display_base='physical', reduce_memory_usage=False, format_version='5.30', filter=None, remove_source_from_channel_names=False, master_channel=None, group=last_group_number)
+    mdf.export(fmt='csv', filename=output_file_path, single_time_base=True, channels=None, time_from_zero=False, empty_channels='skip', keep_same_value=False, raster=None, comment=None, compression=0, ignore_value2text_conversions=False, time_as_date=False, oned_as='column', display_base='physical', reduce_memory_usage=False, format_version='5.30', filter=None, remove_source_from_channel_names=False, master_channel=None, group=last_group_number)
     
-    print(f"Exported the last group (Group {last_group_number}) to {output_csv_path}")
-    return pd.read_csv(output_csv_path)
+    print(f"Exported the last group (Group {last_group_number}) to {output_file_path}")
+    return pd.read_csv(output_file_path)
 
 
 def clean_and_transform_data(df):
@@ -74,12 +81,14 @@ def clean_and_transform_data(df):
 
     return df
 
-def generate_output_files(df_cleaned):
+def generate_output_files(mdf_file_path, df_cleaned):
     if df_cleaned.empty:
         print("Cleaned DataFrame is empty, skipping file generation.")
         return
     
     print("Generating output files...")
+    
+    output_file_path = os.path.splitext(mdf_file_path)[0] + '_OnePerSecond.csv'
 
     # Convert 'timestamps' to a DatetimeIndex
     df_cleaned['timestamps'] = pd.to_datetime(df_cleaned['timestamps'], unit='s')
@@ -87,19 +96,26 @@ def generate_output_files(df_cleaned):
 
     # Generating a CSV file with one record per second
     df_one_per_second = df_cleaned.set_index('timestamps').resample('1S').nearest().reset_index()
-    df_one_per_second.to_csv('one_per_second.csv', index=False)
+    df_one_per_second.to_csv(output_file_path, index=False)
     print("Generated one record per second CSV.")
 
     # Generating a full dataset CSV file
-    df_cleaned.to_csv('full_dataset.csv', index=False)
+    #df_cleaned.to_csv('full_dataset.csv', index=False)
     print("Generated full dataset CSV.")
 
+def main():
+    parser = argparse.ArgumentParser(description='Convert MDF to CSV and perform data cleaning.')
+    parser.add_argument('input_file', type=str, help='Input MDF file path')
 
-# Replace 'your_mdf_file.mf4' with the path to your MDF file
-mdf_file_path = 'input.mdf'
-df = convert_mdf_to_csv(mdf_file_path)
+    args = parser.parse_args()
 
-if not df.empty:
-    print(df.head())
-    df_cleaned = clean_and_transform_data(df)
-    generate_output_files(df_cleaned)
+    df = convert_mdf_to_csv(args.input_file)
+    if df is not None and not df.empty:
+        print(df.head())
+        df_cleaned = clean_and_transform_data(df)
+        generate_output_files(args.input_file, df_cleaned)
+    else:
+        print("Data frame is empty or not created.")
+
+if __name__ == "__main__":
+    main()
