@@ -49,4 +49,5 @@ Replace yourfile.mdf with the name of your MDF file.
 - Docker - Used to containerize the application.
 - Python - The core programming language used.
 
+https://www.asam.net/standards/detail/mdf
 [https://pypi.org/project/asammdf/](ASAM MDF - Measurement Data File Parser)

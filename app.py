@@ -5,47 +5,24 @@ def convert_mdf_to_csv(mdf_file_path):
     print("Loading MDF file...")
     mdf = MDF(mdf_file_path)
 
-    # Log the groups and channels in the MDF file
-    for i, group in enumerate(mdf.groups):
-        print(f"Group {i} contains the following channels:")
-        for channel in group.channels:
-            print(f" - {channel.name}")
+    # Identify the last group number
+    last_group_number = len(mdf.groups) - 1
+    print(f"Identified the last group, this is the one that we want to use: Group {last_group_number}")
 
-    try:
-        print("Converting MDF to DataFrame...")
-        df = mdf.to_dataframe(time_from_zero=True)
-
-        # Handling the time index
-        if df.index.name is None or df.index.name == 'index':
-            print("Resetting index to create a 'time' column...")
-            df.reset_index(inplace=True)
-            df.rename(columns={'index': 'time'}, inplace=True)
-        elif df.index.name == 'time':
-            df.reset_index(inplace=True)
-        
-        # Log the DataFrame columns after conversion
-        print("DataFrame columns after conversion:", df.columns.tolist())
-
-        # Ensure we include only the channels from the last group plus the 'time' column
-        last_group_channels = [ch.name for ch in mdf.groups[-1].channels]
-        if 'time' not in df.columns:
-            print("'time' column is missing after conversion.")
-            return pd.DataFrame()
-        
-        selected_columns = ['time'] + last_group_channels
-        df = df[selected_columns]
-
-        print("Final DataFrame columns:", df.columns.tolist())
-        return df
-    except Exception as e:
-        print(f"Error during MDF to DataFrame conversion: {e}")
-        return pd.DataFrame()
+    # Export only the last group to CSV
+    output_csv_path = mdf_file_path + ".csv"
+    mdf.export(fmt='csv', filename=output_csv_path, single_time_base=True, channels=None, time_from_zero=False, empty_channels='skip', keep_same_value=False, raster=None, comment=None, compression=0, ignore_value2text_conversions=False, time_as_date=False, oned_as='column', display_base='physical', reduce_memory_usage=False, format_version='5.30', filter=None, remove_source_from_channel_names=False, master_channel=None, group=last_group_number)
+    
+    print(f"Exported the last group (Group {last_group_number}) to {output_csv_path}")
+    return pd.read_csv(output_csv_path)
 
 
 def clean_and_transform_data(df):
+    print("Starting data cleaning and transformation...")
+    print("Columns before renaming:", df.columns)
     # Renaming columns based on your SQL script
     column_renames = {
-        'time': 'recording_time',
+        'time': 'timestamps',
         'map_sp': 'manifold_pressure_setpoint',
         'map_mes': 'measured_manifold_pressure',
         'tia': 'throttle_inlet_pressure_or_temperature',
@@ -88,16 +65,12 @@ def clean_and_transform_data(df):
         'state_eng': 'engine_state',
     }
     df.rename(columns=column_renames, inplace=True)
-    
-    print(df.columns)
+    print("Columns after renaming:", df.columns.tolist())
 
     # Convert vehicle speed from km/h to mph
-    df['vehicle_speed'] = df['vehicle_speed'].apply(lambda x: x * 0.621371)
-
-    # Example of data type conversion for numerical columns
-    # df['engine_rpm'] = pd.to_numeric(df['engine_rpm'], errors='coerce')
-
-    # Add any other data transformation or cleaning operations here
+    if 'vehicle_speed' in df.columns:
+        df['vehicle_speed'] = df['vehicle_speed'].apply(lambda x: x * 0.621371)
+        print("Converted vehicle speed from km/h to mph.")
 
     return df
 
@@ -105,13 +78,22 @@ def generate_output_files(df_cleaned):
     if df_cleaned.empty:
         print("Cleaned DataFrame is empty, skipping file generation.")
         return
-        
+    
+    print("Generating output files...")
+
+    # Convert 'timestamps' to a DatetimeIndex
+    df_cleaned['timestamps'] = pd.to_datetime(df_cleaned['timestamps'], unit='s')
+    print("Converted 'timestamps' to datetime format.")
+
     # Generating a CSV file with one record per second
-    df_one_per_second = df_cleaned.set_index('recording_time').resample('S').nearest().reset_index()
+    df_one_per_second = df_cleaned.set_index('timestamps').resample('1S').nearest().reset_index()
     df_one_per_second.to_csv('one_per_second.csv', index=False)
+    print("Generated one record per second CSV.")
 
     # Generating a full dataset CSV file
     df_cleaned.to_csv('full_dataset.csv', index=False)
+    print("Generated full dataset CSV.")
+
 
 # Replace 'your_mdf_file.mf4' with the path to your MDF file
 mdf_file_path = 'input.mdf'
