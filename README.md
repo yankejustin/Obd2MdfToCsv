@@ -17,7 +17,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - Docker
-- Python (if you wish to run the script outside of Docker)
+- Python (if you want to run the script outside of Docker)
 
 ### Installing
 
@@ -46,7 +46,7 @@ Replace yourfile.mdf with the name of your MDF file.
 
 ## Built With
 
-- Python - The core programming language used.
 - Docker - Used to containerize the application.
+- Python - The core programming language used.
 
 [https://pypi.org/project/asammdf/](ASAM MDF - Measurement Data File Parser)
