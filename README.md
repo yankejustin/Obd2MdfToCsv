@@ -30,12 +30,6 @@ cd Obd2MdfToCsv
 
 docker build -t obd2mdftocsv .
 
-3. **Run the Container**
-
-docker run -v ${PWD}/data:/app/data obd2mdftocsv
-
-Replace ${PWD}/data with the path to the directory containing your MDF files.
-
 ### Usage
 
 To convert an MDF to CSV with column name changing and data modification:
@@ -52,15 +46,15 @@ docker run -v YourLocalDirectoryToWhereYouClonedIt\Obd2MdfToCsv\data:/app/data o
     [ASAM MDF](https://www.asam.net/standards/detail/mdf) - Standard for MDF files.
     [ASAM MDF](https://pypi.org/project/asammdf/) - Measurement Data File Parser - Used for parsing MDF files.
 
-## What to do after I update the code
+## When I update the code- bringing the changes from Github to your machine
 
-pull latest code
-
+Pull latest code:
 cd YourLocalDirectoryToWhereYouClonedIt\Obd2MdfToCsv
 git pull origin main
 
-rebuild the docker image
+Rebuild the docker image:
 docker build -t obd2mdftocsv .
 
-run the docker container
-docker run -v YourLocalDirectoryToWhereYouClonedIt\Obd2MdfToCsv\data:/usr/src/app/data obd2mdftocsv /usr/src/app/data/input.mdf
+Run the docker container:
+docker run -v C:\Users\difem\Documents\GitHub\Obd2MdfToCsv\data:/usr/src/app/data obd2mdftocsv OptionalFilePathForInput
+OptionalFilePathForInput can be excluded entirely, it will default to the local path and file: \Obd2MdfToCsv\data\input.mdf
