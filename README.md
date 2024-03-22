@@ -16,7 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- Docker
+- Docker (for Windows users: https://docs.docker.com/desktop/install/windows-install/)
 - Python (if you want to run the script outside of Docker)
 
 ### Installing
@@ -28,18 +28,18 @@ cd Obd2MdfToCsv
 
 2. **Build the Docker Container**
 
-docker build -t Obd2MdfToCsv .
+docker build -t obd2mdftocsv .
 
 3. **Run the Container**
 
-docker run -v ${PWD}/data:/app/data Obd2MdfToCsv
+docker run -v ${PWD}/data:/app/data obd2mdftocsv
 
 Replace ${PWD}/data with the path to the directory containing your MDF files.
 
 ### Usage
 
 To convert an MDF to CSV with column name changing and data modification:
-docker run -v ${PWD}/data:/app/data Obd2MdfToCsv python app.py data/input.mdf data/output.csv
+docker run -v ${PWD}/data:/app/data obd2mdftocsv python app.py data/input.mdf data/output.csv
 
 For example, if you place input.mdf inside the data directory, you can run the container like this:
 
