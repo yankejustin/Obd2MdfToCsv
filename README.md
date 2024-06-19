@@ -4,11 +4,11 @@ Obd2MdfToCsv is an application designed to transform OBD2 MDF file car logs into
 
 ## Features
 
-    Convert MDF to CSV: Seamlessly convert OBD2 MDF files into easily readable CSV format.
-    Data Integrity: Ensures that all data from the MDF file is accurately represented in the CSV output.
-    Filtering Options: Offers options to filter and select specific data parameters for conversion.
-    Batch Processing: Supports processing multiple files at once, saving time and effort.
-    Docker Integration: Packaged with Docker, enabling easy setup and execution across different environments.
+- **Convert MDF to CSV**: Seamlessly convert OBD2 MDF files into an easily readable CSV format.
+- **Data Integrity**: Ensures that all data from the MDF file is accurately represented in the CSV output.
+- **Filtering Options**: Offers options to filter and select specific data parameters for conversion.
+- **Batch Processing**: Supports processing multiple files at once, saving time and effort.
+- **Docker Integration**: Packaged with Docker, enabling easy setup and execution across different environments.
 
 ## Getting Started
 
@@ -16,45 +16,68 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- Docker (for Windows users: https://docs.docker.com/desktop/install/windows-install/)
-- Python (if you want to run the script outside of Docker)
+- [Docker](https://docs.docker.com/desktop/install/windows-install/) (for Windows users)
+- [Python](https://www.python.org/) (if you want to run the script outside of Docker)
 
 ### Installing
 
 1. **Clone the Repository**
 
-git clone https://github.com/yankejustin/Obd2MdfToCsv.git
-cd Obd2MdfToCsv
+    ```bash
+    git clone https://github.com/yankejustin/Obd2MdfToCsv.git
+    cd Obd2MdfToCsv
+    ```
 
 2. **Build the Docker Container**
 
-docker build -t obd2mdftocsv .
+    ```bash
+    docker build -t obd2mdftocsv .
+    ```
 
 ### Usage
 
 To convert an MDF to CSV with column name changing and data modification:
-docker run -v ${PWD}/data:/app/data obd2mdftocsv python app.py data/input.mdf data/output.csv
 
-For example, if you place input.mdf inside the data directory, you can run the container like this:
+    ```bash
+    docker run -v ${PWD}/data:/app/data obd2mdftocsv python app.py data/input.mdf data/output.csv
+    ```
 
-docker run -v YourLocalDirectoryToWhereYouClonedIt\Obd2MdfToCsv\data:/app/data obd2mdftocsv python app.py /app/data/input.mdf
+For example, if you place `input.mdf` inside the `data` directory, you can run the container like this:
+
+    ```bash
+    docker run -v /path/to/Obd2MdfToCsv/data:/app/data obd2mdftocsv python app.py /app/data/input.mdf
+    ```
+
+> **Note:** Replace `/path/to/Obd2MdfToCsv` with the actual path to where you cloned the repository.
 
 ## Built With
 
-    [Docker](https://www.docker.com/) - Used to containerize the application.
-    [Python](https://www.python.org/) - The core programming language used.
-    [ASAM MDF](https://www.asam.net/standards/detail/mdf) - Standard for MDF files.
-    [ASAM MDF](https://pypi.org/project/asammdf/) - Measurement Data File Parser - Used for parsing MDF files.
+- [Docker](https://www.docker.com/) - Used to containerize the application.
+- [Python](https://www.python.org/) - The core programming language used.
+- [MDF Standard Reference](https://www.asam.net/standards/detail/mdf) - Standard for MDF files.
+- [ASAM MDF](https://pypi.org/project/asammdf/) - Measurement Data File Parser - Used for parsing MDF files.
 
-## When I update the code- bringing the changes from Github to your machine
+## Updating the Code
 
-Pull latest code:
-cd YourLocalDirectoryToWhereYouClonedIt\Obd2MdfToCsv
-git pull origin main
+To bring the latest changes from GitHub to your machine:
 
-Rebuild the docker image:
-docker build -t obd2mdftocsv .
+1. **Pull the latest code**:
 
-Run the docker container:
-docker run -v C:\Users\difem\Documents\GitHub\Obd2MdfToCsv\data:/usr/src/app/data obd2mdftocsv OptionalFilePathForInput
-OptionalFilePathForInput can be excluded entirely, it will default to the local path and file: \Obd2MdfToCsv\data\input.mdf
+    ```bash
+    cd /path/to/Obd2MdfToCsv
+    git pull origin main
+    ```
+
+2. **Rebuild the Docker image**:
+
+    ```bash
+    docker build -t obd2mdftocsv .
+    ```
+
+3. **Run the Docker container**:
+
+    ```bash
+    docker run -v /path/to/Obd2MdfToCsv/data:/usr/src/app/data obd2mdftocsv /usr/src/app/data/input.mdf
+    ```
+
+> **Note:** The `OptionalFilePathForInput` parameter can be excluded entirely, and it will default to the local path and file: `/Obd2MdfToCsv/data/input.mdf`
